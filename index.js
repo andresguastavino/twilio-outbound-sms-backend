@@ -28,6 +28,6 @@ app.use((req, res) => {
     return res.status(404).send('not found');
 });
 
-app.listen(process.env.port || 3001, () => {
+app.listen(process.env.PORT || 3001, () => {
     console.log('App listening');
 });
