@@ -1,7 +1,6 @@
 const express = require('express');
 
 const app = express();
-const PORT = process.env.port || 3001;
 
 const outboundSMSHandler = require('./lib/outboundSMSHandler');
 
@@ -29,7 +28,6 @@ app.use((req, res) => {
     return res.status(404).send('not found');
 });
 
-app.listen(PORT, () => {
-    console.log('Listening on PORT: ' + PORT);
-})
-
+app.listen(process.env.port || 3001, () => {
+    console.log('App listening');
+});
