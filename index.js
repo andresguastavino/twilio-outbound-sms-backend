@@ -1,25 +1,29 @@
 const express = require('express');
+const cors = require('cors');
 
 const app = express();
+app.use(cors({
+    origin: '*'
+}));
 
 const outboundSMSHandler = require('./lib/outboundSMSHandler');
+const callsRegisterHandler = require('./lib/callsRegisterHandler');
+const { listCalls } = callsRegisterHandler;
+
+const appHelper = require('./lib/appHelper');
+const { paramsValid, paramsNotValidResponse, handleCallsRegister } = appHelper;
+
+app.get('/calls_register', async (req, res) => await handleCallsRegister({ req, res, paramsValid, paramsNotValidResponse, listCalls }));
+app.get('/calls_register/:limit', async (req, res) => await handleCallsRegister({ req, res, paramsValid, paramsNotValidResponse, listCalls }));
 
 app.get('/outbound_sms', async (req, res) => {
     const { accountSid, authToken } = req.query;
 
-    if(!accountSid || !authToken) {
-        return res.status(400).send({
-            statusCode: 400,
-            status: 'ERROR',
-            type: 'Missing parameters in HTTP request',
-            message: 'accountSid or authToken were not specified in query string parameters'
-        });
-    }
+    if(!paramsValid(accountSid, authToken)) return paramsNotValidResponse(res);
 
     return await outboundSMSHandler.createOutboundConversation({ 
         accountSid,
         authToken,
-        req,
         res
     });
 });
